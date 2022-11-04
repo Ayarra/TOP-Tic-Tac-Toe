@@ -9,6 +9,42 @@
     <title>Tic Tac Toe</title>
   </head>
   <body>
-    bonjour
+    <div class="container">
+      <h1>TIC TAC TOE</h1>
+
+      <h3>Please, choose a playing mode</h3>
+
+      <form action="#">
+        <div class="mode">
+          <div class="versus">
+            <h4>Player vs Player</h4>
+            <div class="cards">
+              <div class="card">
+                <img src="images/person.png" alt="player" />
+                <input type="text" name="player1" id="player1" />
+              </div>
+              <div class="card">
+                <img src="images/person.png" alt="player" />
+                <input type="text" name="player2" id="player2" />
+              </div>
+            </div>
+          </div>
+          <div class="versus">
+            <h4>Player vs Computer</h4>
+            <div class="cards">
+              <div class="card">
+                <img src="images/person.png" alt="player" />
+                <input type="text" name="player" id="player" />
+              </div>
+              <div class="card">
+                <img src="images/robot.png" alt="player" />
+                <input type="text" name="computer" id="computer" />
+              </div>
+            </div>
+          </div>
+          <input type="submit" value="Start game" />
+        </div>
+      </form>
+    </div>
   </body>
 </html>
