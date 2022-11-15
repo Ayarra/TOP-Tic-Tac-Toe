@@ -64,3 +64,26 @@ img {
 input[type="submit"] {
   margin: 15px auto;
 }
+
+.board {
+  border: 1px solid black;
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+  grid-template-rows: repeat(3, 200px);
+  margin-bottom: 20px;
+}
+
+.board div {
+  border: 1px solid black;
+}
+.circle {
+  background-image: url("images/circle.png");
+  background-position: center;
+  background-size: cover;
+}
+
+.x {
+  background-image: url("images/x.png");
+  background-position: center;
+  background-size: cover;
+}
