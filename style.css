@@ -23,6 +23,7 @@ body {
   white-space: nowrap;
   border: 1px solid black;
   min-width: fit-content;
+  position: relative;
 }
 
 .mode {
@@ -86,4 +87,19 @@ input[type="submit"] {
   background-image: url("images/x.png");
   background-position: center;
   background-size: cover;
+}
+
+#replay {
+  padding: 10px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  background-color: #04aa6d;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+}
+
+#replay:hover {
+  background-color: #04aa6dc9;
 }
