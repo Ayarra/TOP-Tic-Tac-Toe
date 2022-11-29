@@ -16,8 +16,9 @@ let game = (function () {
     let cols = [];
     let diag = 0;
     let rdiag = 0;
+    let comb;
 
-    return { rows, cols, diag, rdiag, name };
+    return { rows, cols, diag, rdiag, name, comb };
   };
   nameWarning.innerHTML = "Please, choose a name for the players!";
 
@@ -142,30 +143,32 @@ let game = (function () {
   };
 
   let checkForWin = (player) => {
-    let win = "";
+    // let win = "";
     let winRow = player.rows.findIndex((elm) => elm === 3);
     let winCol = player.cols.findIndex((elm) => elm === 3);
-    if (player.diag === 3) win = colorWiningComb("diag");
-    if (player.rdiag === 3) win = colorWiningComb("rdiag");
-    if (winRow > -1) win = colorWiningComb("row", winRow);
-    if (winCol > -1) win = colorWiningComb("col", winCol);
-    if (win) return player.name;
+    // if (player.diag === 3) win = colorWiningComb("diag");
+    // if (player.rdiag === 3) win = colorWiningComb("rdiag");
+    // if (winRow > -1) win = colorWiningComb("row", winRow);
+    // if (winCol > -1) win = colorWiningComb("col", winCol);
+    // if (win) return player.name;
+    if (player.diag === 3) return player.name;
+    if (player.rdiag === 3) return player.name;
+    if (winRow > -1) return player.name;
+    if (winCol > -1) return player.name;
     if (round === 8 || (mode !== "pvp" && round === 4)) return "tie";
     return false;
   };
 
   let endGame = (status) => {
+    // colorWiningComb(curre);
     if (status === "tie") announcement.innerHTML = "This round ended in a tie!";
     else if (status) announcement.innerHTML = `${status} won this round`;
     container.appendChild(announcement);
   };
 
   let changePlayer = () => {
-    console.log(currentPlayer);
-
     if (currentPlayer.name === playerOne.name) currentPlayer = playerTwo;
     else currentPlayer = playerOne;
-    console.log(currentPlayer);
   };
 
   let boardFill = (player, cell) => {
@@ -179,6 +182,19 @@ let game = (function () {
     else player.cols[ncol] = 1;
     if (nrow === ncol) player.diag += 1;
     if (nrow === gridSize - ncol - 1) player.rdiag += 1;
+  };
+
+  let boardUnfill = (player, cell) => {
+    let nrow = 0;
+    let ncol = 0;
+    nrow = Math.floor(cell / gridSize);
+    ncol = cell - gridSize * nrow;
+    if (player.rows[nrow]) player.rows[nrow]--;
+    else player.rows[nrow] = 0;
+    if (player.cols[ncol]) player.cols[ncol]--;
+    else player.cols[ncol] = 0;
+    if (nrow === ncol) player.diag -= 1;
+    if (nrow === gridSize - ncol - 1) player.rdiag -= 1;
   };
 
   let drawMark = (cell) => {
@@ -198,52 +214,83 @@ let game = (function () {
 
   // Mimimax Algo
 
-  let minimax = (depth, isMaximizing) => {
-    if (checkForWin(playerOne)) return checkForWin(playerOne);
-    else if (checkForWin(playerTwo)) return checkForWin(playerTwo);
-    if (isMaximizing) {
-      let bestScore = -Infinity;
-      board.forEach((cell) => {
-        if (!cell.getAttribute("data-move")) {
-          let score = minimax(depth + 1, false);
-          bestScore = max(score, bestScore);
-        }
-      });
-      return bestScore;
-    } else {
-      let bestScore = Infinity;
-      board.forEach((cell) => {
-        if (!cell.getAttribute("data-move")) {
-          let score = minimax(depth + 1, true);
-          bestScore = min(score, bestScore);
-        }
-      });
-      return bestScore;
-    }
-    // return 1;
-  };
+  // let minimax = (depth, isMaximizing) => {
+  //   let result = checkForWin(currentPlayer);
+  //   if (result) {
+  //     if (result === "tie") {
+  //       return 0;
+  //     } else {
+  //       if (currentPlayer === playerOne) {
+  //         console.log(result);
 
-  let smartAiMove = () => {
-    let bestScore = -Infinity;
-    let bestMove;
+  //         return -1;
+  //       } else {
+  //         console.log(result);
+  //         return 1;
+  //       }
+  //     }
+  //   }
 
-    for (let i = 0; i < board.length; i++) {
-      if (!board[i].getAttribute("data-move")) {
-        // I don't understand the result of this.
-        console.log(board[i]);
-        let score = minimax(0, false);
-        board[i].setAttribute("data-move", "");
-        board[i].classList.remove("circle");
-        if (score > bestScore) {
-          bestScore = score;
-          bestMove = board[i].getAttribute("data-cell");
-        }
-      }
-    }
-    board[bestMove].setAttribute("data-move", "played");
-    board[bestMove].classList.add("circle");
-    boardFill(currentPlayer, bestMove);
-  };
+  //   if (isMaximizing) {
+  //     let bestScore = -Infinity;
+  //     changePlayer();
+  //     // round++;
+
+  //     board.forEach((cell, index) => {
+  //       if (!cell.getAttribute("data-move")) {
+  //         board[index].setAttribute("data-move", "played");
+  //         boardFill(currentPlayer, index);
+  //         let score = minimax(depth + 1, false);
+  //         board[index].setAttribute("data-move", "");
+  //         boardUnfill(currentPlayer, index);
+  //         bestScore = Math.max(score, bestScore);
+  //       }
+  //     });
+  //     changePlayer();
+  //     // round--;
+  //     return bestScore;
+  //   } else {
+  //     let bestScore = Infinity;
+  //     changePlayer();
+  //     // round++;
+
+  //     board.forEach((cell, index) => {
+  //       if (!cell.getAttribute("data-move")) {
+  //         board[index].setAttribute("data-move", "played");
+  //         boardFill(currentPlayer, index);
+  //         let score = minimax(depth + 1, true);
+  //         board[index].setAttribute("data-move", "");
+  //         boardUnfill(currentPlayer, index);
+  //         bestScore = Math.min(score, bestScore);
+  //       }
+  //     });
+  //     changePlayer();
+  //     // round--;
+  //     return bestScore;
+  //   }
+  // };
+
+  // let smartAiMove = () => {
+  //   let bestScore = -Infinity;
+  //   let bestMove;
+  //   board.forEach((cell, index) => {
+  //     if (!cell.getAttribute("data-move")) {
+  //       board[index].setAttribute("data-move", "played");
+  //       boardFill(currentPlayer, index);
+  //       let score = minimax(0, true);
+  //       board[index].setAttribute("data-move", "");
+  //       boardUnfill(currentPlayer, index);
+  //       if (score > bestScore) {
+  //         bestScore = score;
+  //         bestMove = index;
+  //       }
+  //     }
+  //   });
+  //   board[bestMove].setAttribute("data-move", "played");
+  //   board[bestMove].classList.add("circle");
+
+  //   boardFill(currentPlayer, bestMove);
+  // };
 
   let humanMove = (cell, elem) => {
     boardFill(currentPlayer, cell);
@@ -267,9 +314,7 @@ let game = (function () {
           end = checkForWin(currentPlayer);
           changePlayer();
         }
-        // if (round === 4 && !end) end = "tie";
       }
-      // if (round === 8 && !end) end = round;
       round++;
       endGame(end);
     }
