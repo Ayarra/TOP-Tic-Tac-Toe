@@ -113,6 +113,8 @@ let game = (function () {
       cell.style.backgroundColor = "";
       cell.classList.remove("circle");
       cell.classList.remove("x");
+      cell.classList.remove("win");
+
       cell.setAttribute("data-move", "");
     });
   };
