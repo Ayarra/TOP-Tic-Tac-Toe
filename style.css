@@ -96,6 +96,10 @@ input[type="submit"] {
   background-size: cover;
 }
 
+.win {
+  background-color: #04aa65;
+}
+
 .buttons {
   width: 100%;
   margin-top: 10px;

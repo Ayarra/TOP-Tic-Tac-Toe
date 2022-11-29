@@ -120,7 +120,7 @@ let game = (function () {
   // End GAME functions
   let color = (...cells) => {
     cells.forEach((cell) => {
-      cell.style.backgroundColor = "red";
+      cell.classList.add("win");
     });
   };
 
