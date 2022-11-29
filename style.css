@@ -9,11 +9,13 @@ body {
   box-sizing: border-box;
   background-color: rgb(231, 227, 222);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.container {
+.container1,
+.container2 {
   width: 80%;
   margin-top: 100px;
   padding: 0 30px 0 30px;
@@ -25,6 +27,9 @@ body {
   min-width: fit-content;
   position: relative;
 }
+.container2 {
+  display: none;
+}
 
 .mode {
   display: flex;
@@ -32,6 +37,7 @@ body {
   justify-content: center;
   text-align: center;
   gap: 20px;
+  min-width: 420px;
 }
 
 .versus {
@@ -41,6 +47,7 @@ body {
 
 .cards {
   display: flex;
+  justify-content: space-around;
   gap: 20px;
 }
 
@@ -48,7 +55,7 @@ input[type="text"] {
   padding: 5px;
   outline: none;
   border: none;
-  /* margin: 15px auto; */
+  display: none;
 }
 
 input[type="button"]:focus {
@@ -89,7 +96,15 @@ input[type="submit"] {
   background-size: cover;
 }
 
-#replay {
+.buttons {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-evenly;
+}
+#replay,
+#back,
+#submit {
   padding: 10px;
   margin-bottom: 20px;
   cursor: pointer;
@@ -100,6 +115,8 @@ input[type="submit"] {
   text-decoration: none;
 }
 
-#replay:hover {
+#replay:hover,
+#back:hover,
+#submit:hover {
   background-color: #04aa6dc9;
 }

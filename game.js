@@ -1,42 +1,111 @@
 let game = (function () {
-  // Getting DOM Elements
-  let board = document.querySelectorAll(".cell");
-  let container = document.querySelector(".container");
-  let replayButton = document.querySelector("#replay");
-  let announcement = document.createElement("h2");
-
-  // Setting up the game
-  let gridSize = 3;
-  let round = 0;
-  let end = "";
-  let mode = "pvp";
-
+  // Sign UP Page
+  let game = document.querySelector(".container1");
+  let boardGame = document.querySelector(".container2");
+  let containerSign = document.querySelector(".mode");
+  let versus = document.querySelectorAll(".versus");
+  let playerForm = document.querySelectorAll(".vsPlayer");
+  let aiForm = document.querySelectorAll(".vsComputer");
+  let submitButton = document.querySelector("#submit");
+  let choiceText = document.querySelector("h3");
+  let nameWarning = document.createElement("p");
+  let playerOne;
+  let playerTwo;
   let Player = (name) => {
     let rows = [];
     let cols = [];
     let diag = 0;
     let rdiag = 0;
 
-    let ai = false;
-    return { rows, cols, diag, rdiag, name, ai };
+    return { rows, cols, diag, rdiag, name };
   };
+  nameWarning.innerHTML = "Please, choose a name for the players!";
 
-  let playerOne = Player("po");
-  let playerTwo = Player("pt");
-  if (mode !== "pvp") playerTwo.ai = true;
+  let mode;
+  let param = {};
+
+  versus.forEach((elm, index) => {
+    elm.addEventListener("click", () => {
+      if (index === 0) {
+        mode = "pvp";
+        for (let i = 0; i < 2; i++) {
+          playerForm[i].style.display = "inherit";
+          aiForm[i].style.display = "none";
+          aiForm[i].value = "";
+        }
+      } else {
+        mode = "pve";
+        for (let i = 0; i < 2; i++) {
+          playerForm[i].style.display = "none";
+          playerForm[i].value = "";
+          aiForm[i].style.display = "inherit";
+        }
+      }
+    });
+  });
+
+  submitButton.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    if (!mode) {
+      choiceText.style.color = "red";
+      choiceText.style.fontSize = "30px";
+    } else {
+      if (mode === "pvp") {
+        if (!playerForm[0].value || !playerForm[1].value)
+          containerSign.insertBefore(nameWarning, submitButton);
+        else {
+          param.po = playerForm[0].value;
+          param.pt = playerForm[1].value;
+          param.mode = mode;
+          game.style.display = "none";
+          boardGame.style.display = "inherit";
+        }
+      } else {
+        if (!aiForm[0].value || !aiForm[1].value)
+          containerSign.insertBefore(nameWarning, submitButton);
+        else {
+          param.po = aiForm[0].value;
+          param.pt = aiForm[1].value;
+          param.mode = mode;
+          game.style.display = "none";
+          boardGame.style.display = "inherit";
+        }
+      }
+      playerOne = Player(param.po);
+      playerTwo = Player(param.pt);
+      currentPlayer = playerOne;
+    }
+  });
+
+  // TIC TAC TOE GAME
+  // Getting DOM Elements
+  let board = document.querySelectorAll(".cell");
+  let container = document.querySelector(".container2");
+  let replayButton = document.querySelector("#replay");
+  let backButton = document.querySelector("#back");
+
+  let announcement = document.createElement("h2");
+
+  // Setting up the game
+  let gridSize = 3;
+  let round = 0;
+  let end = "";
+
+  // let playerOne = Player(param.po);
+  // let playerTwo = Player(param.pt);
   let currentPlayer = playerOne;
 
   let resetBoard = () => {
     // Resetting the players
-    playerOne = Player("po");
-    playerTwo = Player("pt");
+    playerOne = Player(param.po);
+    playerTwo = Player(param.pt);
     currentPlayer = playerOne;
 
     // Resetting Global variables
     round = 0;
     end = "";
     announcement.innerHTML = "";
-    playerOne.turn = 1;
 
     // Resetting the board
     board.forEach((cell) => {
@@ -81,14 +150,22 @@ let game = (function () {
     if (winRow > -1) win = colorWiningComb("row", winRow);
     if (winCol > -1) win = colorWiningComb("col", winCol);
     if (win) return player.name;
+    if (round === 8 || (mode !== "pvp" && round === 4)) return "tie";
     return false;
   };
 
   let endGame = (status) => {
-    if (status === 9 || status === "tie")
-      announcement.innerHTML = "This round ended in a tie!";
+    if (status === "tie") announcement.innerHTML = "This round ended in a tie!";
     else if (status) announcement.innerHTML = `${status} won this round`;
     container.appendChild(announcement);
+  };
+
+  let changePlayer = () => {
+    console.log(currentPlayer);
+
+    if (currentPlayer.name === playerOne.name) currentPlayer = playerTwo;
+    else currentPlayer = playerOne;
+    console.log(currentPlayer);
   };
 
   let boardFill = (player, cell) => {
@@ -102,12 +179,6 @@ let game = (function () {
     else player.cols[ncol] = 1;
     if (nrow === ncol) player.diag += 1;
     if (nrow === gridSize - ncol - 1) player.rdiag += 1;
-
-    // Changing players
-    if (currentPlayer.name === playerOne.name) currentPlayer = playerTwo;
-    else currentPlayer = playerOne;
-
-    return checkForWin(player);
   };
 
   let drawMark = (cell) => {
@@ -122,38 +193,98 @@ let game = (function () {
     }
     board[aiCell].setAttribute("data-move", "played");
     board[aiCell].classList.add("circle");
-    return boardFill(currentPlayer, aiCell);
+    boardFill(currentPlayer, aiCell);
   };
 
-  let playerMove = (elem) => {
+  // Mimimax Algo
+
+  let minimax = (depth, isMaximizing) => {
+    if (checkForWin(playerOne)) return checkForWin(playerOne);
+    else if (checkForWin(playerTwo)) return checkForWin(playerTwo);
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+      board.forEach((cell) => {
+        if (!cell.getAttribute("data-move")) {
+          let score = minimax(depth + 1, false);
+          bestScore = max(score, bestScore);
+        }
+      });
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      board.forEach((cell) => {
+        if (!cell.getAttribute("data-move")) {
+          let score = minimax(depth + 1, true);
+          bestScore = min(score, bestScore);
+        }
+      });
+      return bestScore;
+    }
+    // return 1;
+  };
+
+  let smartAiMove = () => {
+    let bestScore = -Infinity;
+    let bestMove;
+
+    for (let i = 0; i < board.length; i++) {
+      if (!board[i].getAttribute("data-move")) {
+        // I don't understand the result of this.
+        console.log(board[i]);
+        let score = minimax(0, false);
+        board[i].setAttribute("data-move", "");
+        board[i].classList.remove("circle");
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = board[i].getAttribute("data-cell");
+        }
+      }
+    }
+    board[bestMove].setAttribute("data-move", "played");
+    board[bestMove].classList.add("circle");
+    boardFill(currentPlayer, bestMove);
+  };
+
+  let humanMove = (cell, elem) => {
+    boardFill(currentPlayer, cell);
+    end = checkForWin(currentPlayer);
+    changePlayer();
+    drawMark(elem);
+    elem.setAttribute("data-move", "played");
+  };
+
+  let playerRound = (elem) => {
     let move = elem.getAttribute("data-move");
     let cell = parseInt(elem.getAttribute("data-cell"));
     if (!move && !end) {
-      round++;
-      if (mode === "pvp") {
-        end = boardFill(currentPlayer, cell);
-        drawMark(elem);
-        elem.setAttribute("data-move", "played");
+      if (param.mode === "pvp") {
+        humanMove(cell, elem);
       } else {
-        end = boardFill(currentPlayer, cell);
-        drawMark(elem);
-        elem.setAttribute("data-move", "played");
-        if (round < 5 && !end) {
-          end = aiMove();
+        humanMove(cell, elem);
+        if (round < 4 && !end) {
+          aiMove();
+          // smartAiMove();
+          end = checkForWin(currentPlayer);
+          changePlayer();
         }
-        if (round === 5 && !end) end = "tie";
+        // if (round === 4 && !end) end = "tie";
       }
-      if (round === 9 && !end) end = round;
+      // if (round === 8 && !end) end = round;
+      round++;
       endGame(end);
     }
   };
 
   // Event listeners
   replayButton.addEventListener("click", () => resetBoard());
-
+  backButton.addEventListener("click", () => {
+    resetBoard();
+    game.style.display = "inherit";
+    boardGame.style.display = "none";
+  });
   board.forEach((square) => {
     square.addEventListener("click", () => {
-      playerMove(square);
+      playerRound(square);
     });
   });
 })();
