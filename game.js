@@ -143,18 +143,18 @@ let game = (function () {
   };
 
   let checkForWin = (player) => {
-    // let win = "";
+    let win = "";
     let winRow = player.rows.findIndex((elm) => elm === 3);
     let winCol = player.cols.findIndex((elm) => elm === 3);
-    // if (player.diag === 3) win = colorWiningComb("diag");
-    // if (player.rdiag === 3) win = colorWiningComb("rdiag");
-    // if (winRow > -1) win = colorWiningComb("row", winRow);
-    // if (winCol > -1) win = colorWiningComb("col", winCol);
-    // if (win) return player.name;
-    if (player.diag === 3) return player.name;
-    if (player.rdiag === 3) return player.name;
-    if (winRow > -1) return player.name;
-    if (winCol > -1) return player.name;
+    if (player.diag === 3) win = colorWiningComb("diag");
+    if (player.rdiag === 3) win = colorWiningComb("rdiag");
+    if (winRow > -1) win = colorWiningComb("row", winRow);
+    if (winCol > -1) win = colorWiningComb("col", winCol);
+    if (win) return player.name;
+    // if (player.diag === 3) return player.name;
+    // if (player.rdiag === 3) return player.name;
+    // if (winRow > -1) return player.name;
+    // if (winCol > -1) return player.name;
     if (round === 8 || (mode !== "pvp" && round === 4)) return "tie";
     return false;
   };
